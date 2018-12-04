@@ -69,9 +69,21 @@
              (inc y))
       fabric)))
 
+(defn count-double-claims-in-row [fabric-row]
+  (reduce #(if (>= %2 2) (inc %) %) fabric-row))
+
 (defn solve-1 []
-  
-)
+  (def claims (map parse-claim data))
+    
+  (def fabric
+    (-> claims
+        (max-dims)
+        (make-fabric)))
+    
+  (def claimed-fabric
+    (reduce stake-claim fabric claims))
+
+  (reduce + (map count-double-claims-in-row claimed-fabric)))
 
 (defn solve-2 []
 
