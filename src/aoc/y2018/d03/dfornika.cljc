@@ -14,6 +14,7 @@
      :cljs (js/parseInt s)))
 
 (defn parse-claim [claim-string]
+  "Takes a string representation of a claim and returns a map"
   (let [split-claim (str/split claim-string #" ")]
     {:id (str->int (str/replace (nth split-claim 0) "#" ""))
      :x (str->int (first (str/split (nth split-claim 2) #",")))
@@ -50,6 +51,23 @@
        (vec)
        (repeat length)
        (vec)))
+
+(defn inc-index [v idx]
+  "Increment a single element in a vector of numbers v, at index idx"
+  (update-in v [idx] inc))
+
+(defn inc-range [v min max]
+  "Increment a range of elements in a vector of numbers v, from indices min to max"
+  (reduce inc-index v (range min max)))
+
+(defn stake-claim [fabric claim]
+  "Increments values on fabric for area covered by claim"
+  (loop [fabric fabric
+         y (claim :y)]
+    (if (not (>= y (+ (claim :y) (claim :height))))
+      (recur (update-in fabric [y] #(inc-range % (claim :x) (+ (claim :x) (claim :width))))
+             (inc y))
+      fabric)))
 
 (defn solve-1 []
   
